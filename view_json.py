@@ -2,21 +2,26 @@ import json
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description="Wyświetl zawartość pliku JSON w sformatowany sposób.")
-parser.add_argument("-n", help="Nazwa pliku JSON do wyświetlenia")
+parser = argparse.ArgumentParser(description="Format JSON file for better readability")
+parser.add_argument("-n", help="Name of the JSON file to display", required=True)
 args = parser.parse_args()
 
-def wyswietl_json(nazwa_pliku):
-    if not os.path.exists(nazwa_pliku):
-        print(f"❌ Error: File with name '{nazwa_pliku}' does not exist.")
+def wyswietl_json(filename):
+    if not os.path.exists(filename):
+        print(f"❌ Error: File with name '{filename}' does not exist.")
         return
 
-    try:
-        with open(nazwa_pliku, 'r', encoding='utf-8') as plik:
-            dane = json.load(plik)
+    os.makedirs("output", exist_ok=True)
+    name, ext = os.path.splitext(filename)
+    name = os.path.basename(name)
+    print(f"📂 Processing file: {name}")
 
-        with open(f"{nazwa_pliku}_formated.json", 'w', encoding='utf-8') as plik:
-            json.dump(dane, plik, indent=4, ensure_ascii=False)
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        with open(f"output/{name}_formated.json", 'w', encoding='utf-8') as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
 
 
     except json.JSONDecodeError:
