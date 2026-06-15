@@ -1,6 +1,6 @@
 import sys
 from PyQt5.Qsci import QsciScintilla, QsciLexerJavaScript
-from app_widgets import *
+from .app_widgets import *
 
 class JsonFormatterApp(QMainWindow):
     def __init__(self):
