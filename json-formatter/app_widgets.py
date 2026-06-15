@@ -43,10 +43,22 @@ class HTTPPanel(QFrame):
         
         buttons_layout = QVBoxLayout()
         
+
+        # Przycisk dodawania nowego parametru
         self.btn_add_param = QPushButton("Dodaj pole parametru zapytania")
         self.btn_add_param.clicked.connect(self.add_param_row)
         buttons_layout.addWidget(self.btn_add_param)
         
+        #Przycisk wczytywania konfiguracji zapytania z pliku JSON
+        self.btn_load_config = QPushButton("Wczytaj konfigurację zapytania")
+        self.btn_load_config.clicked.connect(self.load_config)
+        buttons_layout.addWidget(self.btn_load_config)
+
+        # Przycisk zapisywania konfiguracji zapytania do pliku JSON
+        self.btn_save_config = QPushButton("Zapisz konfigurację zapytania")
+        self.btn_save_config.clicked.connect(self.save_config)
+        buttons_layout.addWidget(self.btn_save_config)
+
         self.btn_send = QPushButton("Wyślij zapytanie")
         self.btn_send.clicked.connect(self.send_http_request)
         buttons_layout.addWidget(self.btn_send)
@@ -169,3 +181,58 @@ class HTTPPanel(QFrame):
         finally:
             self.btn_send.setEnabled(True)
             self.btn_send.setText("Wyślij zapytanie")
+    
+    def save_config(self):
+        config = {
+            "method": self.method_combo.currentText(),
+            "url": self.line_url.text(),
+            "params": [(key_edit.text(), val_edit.text()) for key_edit, val_edit, _ in self.param_widgets]
+        }
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getSaveFileName(
+            self, "Zapisz jako...", "", "JSON Files (*.json);;All Files (*)", options=options
+        )
+
+        if file_name:
+            try:
+                with open(file_name, 'w', encoding='utf-8') as file:
+                    json.dump(config, file, indent=3, ensure_ascii=True)
+
+                QMessageBox.information(self, "Sukces", "Plik został pomyślnie zapisany.")
+            except Exception as e:
+                QMessageBox.critical(self, "Błąd", f"Nie udało się zapisać pliku:\n{str(e)}")
+
+
+    def load_config(self):
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getOpenFileName(
+            self, "Wybierz plik JSON", "", "JSON Files (*.json);;All Files (*)", options=options
+        )
+
+        if file_name:
+            try:
+                with open(file_name, 'r', encoding='utf-8') as file:
+                    config = json.load(file)
+
+                # Ustawiamy metodę i URL
+                self.method_combo.setCurrentText(config.get("method", "GET"))
+                self.line_url.setText(config.get("url", ""))
+
+                # Usuwamy istniejące parametry
+                for _, _, row_widget in self.param_widgets:
+                    self.params_layout.removeWidget(row_widget)
+                    row_widget.deleteLater()
+                self.param_widgets.clear()
+
+                # Dodajemy parametry z konfiguracji
+                for key, val in config.get("params", []):
+                    self.add_param_row()
+                    if self.param_widgets:
+                        last_key_edit, last_val_edit, _ = self.param_widgets[-1]
+                        last_key_edit.setText(key)
+                        last_val_edit.setText(val)
+
+            except json.JSONDecodeError:
+                QMessageBox.critical(self, "Błąd", "Wybrany plik nie jest poprawnym plikiem JSON.")
+            except Exception as e:
+                QMessageBox.critical(self, "Błąd", f"Nie udało się wczytać pliku:\n{str(e)}")

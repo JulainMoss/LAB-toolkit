@@ -119,7 +119,7 @@ class JsonViewerApp(QMainWindow):
             try:
                 indent_size = self.spin_indent.value()
                 with open(file_name, 'w', encoding='utf-8') as file:
-                    json.dump(self.json_data, file, indent=indent_size, ensure_ascii=False)
+                    json.dump(self.json_data, file, indent=indent_size, ensure_ascii=True)
 
                 QMessageBox.information(self, "Sukces", "Plik został pomyślnie zapisany.")
             except Exception as e:
