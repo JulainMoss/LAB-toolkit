@@ -2,7 +2,7 @@ import sys
 from PyQt5.Qsci import QsciScintilla, QsciLexerJavaScript
 from app_widgets import *
 
-class JsonViewerApp(QMainWindow):
+class JsonFormatterApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.json_data = None
@@ -136,6 +136,6 @@ class JsonViewerApp(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = JsonViewerApp()
+    window = JsonFormatterApp()
     window.show()
     sys.exit(app.exec_())
