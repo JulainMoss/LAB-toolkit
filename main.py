@@ -2,11 +2,18 @@ import sys
 
 from JSONFormatter import JsonFormatterApp
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QVBoxLayout
+import tomllib
+
+with open("../pyproject.toml", "rb") as f:
+    pyproject = tomllib.load(f)
+
+APP_VERSION = pyproject["project"]["version"]
 
 class LABToolkitApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("LAB Toolkit")
+        self.setWindowTitle(f"LAB Toolkit v{APP_VERSION}")
+        self.resize(400, 200)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
